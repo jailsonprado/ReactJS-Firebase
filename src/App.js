@@ -8,6 +8,10 @@ function App() {
   const [titulo, setTitulo] = useState("");
   const [autor, setAutor] = useState("");
   const [post, setPost] = useState([]);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [user, setUser] = useState(false);
+  const [userLogged, setUserLogged] = useState({});
 
   useEffect(() => {
     async function loadPost(post) {
@@ -30,6 +34,24 @@ function App() {
 
     loadPost();
   }, []);
+
+  useEffect(() => {
+    async function checkLogin(){
+      await firebase.auth().onAuthStateChanged((user) => {
+        if(user){
+          setUser(true);
+          setUserLogged({
+            uid: user.uid,
+            email: user.email
+          });
+        }else{
+          setUser(false);
+          setUserLogged({});
+        }
+      })
+    }
+    checkLogin();
+  },[])
 
   async function handleAdd() {
     await firebase
@@ -113,10 +135,56 @@ function App() {
       })
   }
 
+  async function novousuario(){
+    await firebase.auth().createUserWithEmailAndPassword(email, senha)
+      .then(() => {
+         alert("cadastrado com sucesso!")
+          setEmail(''); setSenha('');
+        })
+        .catch((error) => {
+          if(error.code === 'auth/weak-password'){
+            alert('Senha muito fraca')
+          }
+          else if(error.code === 'auth/email-already-in-use'){
+            alert('Email ja esta sendo usado, faca login ou escolha outro email')
+          }
+        })
+  }
+  async function logout(){
+    await firebase.auth().signOut();
+  }
+
+
   return (
     <div>
       <h1>ReactJS + Firebase</h1> <br />
+
+      {user && (
+        <div>
+          <strong>Seja bem vindo! (Voce esta logado)</strong><br />
+          <span>{userLogged.uid} - {userLogged.email}</span>
+          <br/><br />
+        </div>
+      )}
+
       <div className="container">
+        <label>Email</label>
+        <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}/>
+       
+        <label>Senha</label>
+        <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)}/> <br />
+
+        <button onClick={novousuario}>Cadastrar</button>
+        <button onClick={logout}>Sair da conta</button>
+      </div> <br /> <br />
+
+      <hr/> <br />
+
+
+
+
+      <div className="container">
+        <h1>Banco de dados:</h1>
         <label>ID: </label>
         <input
           type="text"
