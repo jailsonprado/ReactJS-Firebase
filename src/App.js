@@ -105,6 +105,14 @@ function App() {
       .catch((error) => alert(`Erro ao editar dados ${error}`));
   }
 
+  async function excluirPost(id){
+    await firebase.firestore().collection("posts").doc(id)
+      .delete()
+        .then(()=>{
+          alert("Esse post foi excluido")
+      })
+  }
+
   return (
     <div>
       <h1>ReactJS + Firebase</h1> <br />
@@ -144,7 +152,8 @@ function App() {
                 <span>Titulo: {item.titulo}</span>
                 <br />
                 <span>Autor: {item.autor}</span>
-                <br /> <br />
+                <br />
+                <button onClick={() => excluirPost(item.id) }>excluir</button> <br /> <br />
               </li>
             );
           })}
