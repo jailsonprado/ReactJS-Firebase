@@ -1,5 +1,5 @@
 import firebase from "./firebaseConnection";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import "./style.css";
 
@@ -7,6 +7,26 @@ function App() {
   const [titulo, setTitulo] = useState("");
   const [autor, setAutor] = useState("");
   const [post, setPost] = useState([]);
+
+  useEffect(() => {
+    async function loadPost(post) {
+      await firebase.firestore().collection('posts')
+      .onSnapshot((doc) => {
+        let myPosts = [];
+
+        doc.forEach((item) => {
+          myPosts.push({
+            id: item.id,
+            titulo: item.data().titulo,
+            autor: item.data().autor
+          })
+        })
+        setPost(myPosts)
+      })
+    }
+
+    loadPost()
+  },[])
 
    async function handleAdd(){
       await firebase.firestore().collection('posts')
@@ -83,7 +103,7 @@ function App() {
         />
 
         <button onClick={handleAdd}>Cadastrar</button>
-        <button onClick={buscaPost} >Buscar Post</button><br/>
+        <button onClick={buscaPost}>Buscar Post</button><br/>
 
         
         <ul>
