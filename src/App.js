@@ -154,6 +154,16 @@ function App() {
     await firebase.auth().signOut();
   }
 
+  async function fazerLogin(){
+    await firebase.auth().signInWithEmailAndPassword(email, senha)
+      .then((value) => {
+        console.log(value)
+      })
+      .catch((error) => {
+        alert(`Login invalido ${error}`)
+      })
+  }
+
 
   return (
     <div>
@@ -174,6 +184,7 @@ function App() {
         <label>Senha</label>
         <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)}/> <br />
 
+        <button onClick={fazerLogin}>Login</button>
         <button onClick={novousuario}>Cadastrar</button>
         <button onClick={logout}>Sair da conta</button>
       </div> <br /> <br />
